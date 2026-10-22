@@ -1,20 +1,14 @@
 <h3 id="zappel">Zappel (Apple Watch) &mdash; Privacy</h3>
-<p>Zappel is an open-source arcade game for Apple Watch, in which a sprinkler turns caterpillars into butterflies. It runs on the watch alone and makes no network connection of any kind. This section is the canonical statement of what Zappel does and does not do with your data. The app is open source so that every claim here is independently verifiable. The repository is at <a href="https://github.com/excelano/zappel" rel="noopener noreferrer">github.com/excelano/zappel</a>.</p>
+<p>Zappel is a garden arcade game for Apple Watch: a sprinkler at the bottom of the screen turns caterpillars into butterflies. A game like that needs to know a score and two switches, so that is all Zappel keeps. It cannot reach the internet, has no account to create and asks for no permissions. The App Store lists it under &ldquo;Data Not Collected&rdquo;.</p>
 
-<h4>The short version</h4>
-<p>Zappel talks to nothing. There is no server behind it, no account to create, no advertising, no analytics, no telemetry, no crash reporting and no third-party code. Its App Store privacy declaration is &ldquo;Data Not Collected,&rdquo; because the developer collects nothing and has nowhere to put it.</p>
+<h4>A score and two switches</h4>
+<p>Zappel saves three values in the watch's storage for the app: your best score, and whether Sound and Haptics are on. No names or initials go with the score. Reset Best Score in Settings erases the score, and removing Zappel from the watch erases all three.</p>
 
-<h4>What stays on your watch</h4>
-<p>Zappel keeps your best score, the last wave you reached, and whether sound and haptics are turned on. It stores no names or initials. These live in the app's own preferences on the watch, are never sent anywhere, and are removed when the app is removed. Reset Best Score in Settings clears the score and the wave.</p>
+<h4>No connection, no extras</h4>
+<p>No line of Zappel's code makes a network request. That rules out advertising, analytics, crash reporting, update checks and anything else that would need to phone out, and no code from other companies is built in. Zappel cannot see your location, health data, contacts or microphone.</p>
 
-<h4>What leaves your watch</h4>
-<p><strong>Nothing.</strong> Zappel makes no network request. It has no update check, no analytics service, no crash reporter and no remote logging, and it asks for no permission to reach your contacts, location, health data, microphone or anything else on the watch.</p>
+<h4>What Apple shows the developer</h4>
+<p>Apple keeps install counts on its own, and passes the developer crash logs only from watches whose owners chose Share With App Developers. Both reach the developer as anonymous totals, and Zappel has no hand in either. The switch for crash logs is on the paired iPhone, in Settings &gt; Privacy &amp; Security &gt; Analytics &amp; Improvements.</p>
 
-<h4>One thing outside the app's control</h4>
-<p>Apple collects its own figures about installs and, on devices where <strong>Share With App Developers</strong> is turned on, aggregate anonymous crash logs. Zappel contains no code that touches that data, but Apple may still show the developer aggregate, anonymised numbers. On the paired iPhone the control is at <strong>Settings &gt; Privacy &amp; Security &gt; Analytics &amp; Improvements</strong>, and it applies to every app, not only this one.</p>
-
-<h4>How to verify the claims yourself</h4>
-<p>The full source is at <a href="https://github.com/excelano/zappel" rel="noopener noreferrer">github.com/excelano/zappel</a>. Search it for anything that opens a network connection, such as <code>URLSession</code>, <code>Network</code> or a URL being fetched: there is none. Search for what it stores: every key it writes to its preferences is listed in one place, <code>StorageKey</code> in <code>HighScoreStore.swift</code>.</p>
-
-<h4>Updates to this section</h4>
-<p>This section changes as the app changes. The change history is the git log of <code>packaging/privacy-entry.html</code> in the Zappel source repository, which is where this text is maintained.</p>
+<h4>Seeing it for yourself</h4>
+<p>The three preference keys are the whole of <code>StorageKey</code>, in <code>HighScoreStore.swift</code>, and the rest of the source is public too, at <a href="https://github.com/excelano/zappel" rel="noopener noreferrer">github.com/excelano/zappel</a>. This section is kept in the same repository as <code>packaging/privacy-entry.html</code>; every change to it shows in the commit history.</p>

@@ -8,20 +8,24 @@
 # description 4,000, apple-review-notes 4,000.
 
 apple-review-notes = """
-Zappel is an arcade game for Apple Watch. It is watch-only; the iOS app in this package is an empty container that App Store Connect requires, and everything is reviewed on the watch. There is no sign-in, no account and no network connection.
+Zappel is a single-player arcade game. It is built for Apple Watch and plays only there: the iOS target in this upload contains no code and is the wrapper App Store Connect needs for a watch-only app. Nothing has to be set up first. There is no login, and the game never uses the network.
 
-HOW TO PLAY
-1. Open Zappel on the Apple Watch and tap Play.
-2. Turn the Digital Crown, or slide a finger left or right, to move the sprinkler along the bottom of the screen. It sprays water by itself.
-3. Each caterpillar segment the water hits turns into a butterfly and flies away. Clear every segment to finish the wave.
-4. A caterpillar, bee or acorn touching the sprinkler costs a life. The game ends when the lives run out.
+THE FIRST GAME
+Launch Zappel on the watch and tap Play. A green caterpillar crawls down the garden from the top, row by row. The sprinkler at the bottom fires water upward on its own; aim it with the Digital Crown, or drag a finger left and right across the screen. Every segment the water reaches becomes a butterfly and leaves a flower bud. When the last segment is gone, the next wave begins.
 
-Tap the screen to pause. Sound is off by default and can be turned on in Settings.
+LIVES
+The game starts with three lives, shown as a sprinkler and a count beside the score. Contact with a caterpillar, the bee or an acorn takes one away, and after it the garden's flowers are repaired before play resumes. Every 12,000 points adds a life, to a maximum of six. With none left, a game over screen shows the score and the best score.
 
-PRIVACY
-Zappel makes no network request and collects nothing. It keeps the best score, the last wave reached and the sound and haptics settings in its own preferences on the watch. The privacy policy is at https://excelano.com/legal/#zappel and the complete source is public at https://github.com/excelano/zappel.
+LATER WAVES
+Acorns start falling in wave 2, and take two hits. Snails appear from wave 3 and make the flowers they cross slippery, so a caterpillar touching one slides straight down. The garden's light shifts from morning toward dusk from wave to wave, and the caterpillars speed up.
 
-Contact for review questions: David M. Anderson, david.anderson@excelano.com.
+SETTINGS AND PAUSING
+A tap on the game pauses it, and so does lowering the wrist. Settings has a Sound switch, off when the app is first installed, a Haptics switch, and Reset Best Score.
+
+STORAGE
+Three values are saved in the app's preferences on the watch: the best score and the two switches. Zappel sends nothing anywhere. The policy is at https://excelano.com/legal/#zappel, and the source at https://github.com/excelano/zappel.
+
+Questions can go to David M. Anderson at david.anderson@excelano.com.
 """
 
 [locales."en-us"]
@@ -37,13 +41,15 @@ Watch out for visitors. A bumblebee zigzags through the bottom of the garden col
 
 Lose a life and the garden is repaired, flower by flower, before the wave starts again. Every wave moves the day from morning toward dusk, and the caterpillars get quicker.
 
-Nothing explodes and nothing gets hurt: caterpillars become butterflies, bees fly off and snails roll away in their shells. Sound starts off, so it is quiet in a classroom, and a lowered wrist pauses the game.
+Nothing explodes and nothing gets hurt: caterpillars become butterflies, bees fly off and snails roll away in their shells. Sound starts off, and a lowered wrist pauses the game.
 
-Zappel runs on the watch alone and needs no iPhone app, so it works on a watch set up with Family Setup. There are no ads, no accounts, no in-app purchases and no tracking, and it never goes online. It is open source under the MIT license.
+You start with three sprinklers and earn another every 12,000 points, up to six, and the best score stays on the watch for the next game to beat.
+
+Zappel installs straight onto the watch, including a watch under Family Setup. It has nothing to buy, nothing to sign up for and no advertising, and it does not connect to the internet at all. The code is published on GitHub for anyone curious about how the garden works.
 """
 
 [locales."en-us".apple]
 name = "Zappel"
 subtitle = "Caterpillars into butterflies"
-promotional-text = "A garden arcade game made for the watch. Turn the Crown to aim the sprinkler and turn every caterpillar into a butterfly. No ads, no accounts, and it never goes online."
-keywords = "arcade,garden,shooter,retro,kids,family,offline,watch game,bugs,flowers,bee,snail,sprinkler"
+promotional-text = "Aim the sprinkler with the Crown, and every caterpillar segment you soak becomes a butterfly. Bees, acorns and snails join in as the garden heads toward dusk."
+keywords = "arcade,garden,shooter,retro,family,offline,watch game,bugs,flowers,bee,snail,sprinkler"

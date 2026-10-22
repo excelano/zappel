@@ -20,7 +20,7 @@ The rules live in `Zappel Watch App/Game/`, which imports nothing: `GameModel` a
 
 ## Privacy
 
-Zappel makes no network connection. It keeps the best score, the last wave reached and the sound and haptics settings on the watch, and nothing else. The full statement is at [excelano.com/legal/#zappel](https://excelano.com/legal/#zappel).
+Zappel makes no network connection. It keeps the best score and the sound and haptics settings on the watch, and nothing else. The full statement is at [excelano.com/legal/#zappel](https://excelano.com/legal/#zappel).
 
 ## License
 

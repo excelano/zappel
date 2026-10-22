@@ -13,7 +13,7 @@ final class GameScene: SKScene {
     let model: GameModel
     /// Where the player is steering the sprinkler, in cells.
     var playerTarget: Double
-    var onGameOver: ((_ score: Int, _ wave: Int) -> Void)?
+    var onGameOver: ((_ score: Int) -> Void)?
     var reduceMotion = false
     var isGamePaused = false {
         didSet {
@@ -314,7 +314,7 @@ final class GameScene: SKScene {
             case .waveStarted(let wave):
                 startWave(wave)
             case .gameOver:
-                onGameOver?(model.score, model.wave)
+                onGameOver?(model.score)
             }
         }
     }

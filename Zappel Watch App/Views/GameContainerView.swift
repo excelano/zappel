@@ -90,8 +90,8 @@ struct GameContainerView: View {
         let model = GameModel(rows: rows, seed: Self.seed())
         let scene = GameScene(size: size, model: model, scale: WKInterfaceDevice.current().screenScale)
         scene.reduceMotion = reduceMotion
-        scene.onGameOver = { score, wave in
-            let isNewBest = HighScoreStore.record(score: score, wave: wave)
+        scene.onGameOver = { score in
+            let isNewBest = HighScoreStore.record(score: score)
             result = GameResult(score: score, best: HighScoreStore.best, isNewBest: isNewBest)
         }
         self.scene = scene
