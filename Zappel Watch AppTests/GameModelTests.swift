@@ -6,7 +6,7 @@ import Foundation
 import Testing
 @testable import Zappel_Watch_App
 
-/// An empty garden 20 rows tall (player zone rows 16 to 19), with no bee or acorn
+/// An empty garden 20 rows tall (player zone rows 18 and 19), with no bee or acorn
 /// coming, the player in column 8, and a one-segment caterpillar parked at the top
 /// left so the wave does not end on the first tick.
 func garden() -> GameModel {
@@ -46,13 +46,13 @@ func nextMove(_ game: GameModel) {
 struct CaterpillarMovementTests {
     @Test func dropsAndReversesAtTheWall() {
         let game = garden()
-        game.caterpillars = [caterpillar(at: [(15, 3), (14, 3)], direction: 1)]
+        game.caterpillars = [caterpillar(at: [(0, 3), (1, 3)], direction: -1)]
         nextMove(game)
-        #expect(game.caterpillars[0].segments[0].cell == Cell(col: 15, row: 4))
-        #expect(game.caterpillars[0].segments[1].cell == Cell(col: 15, row: 3))
-        #expect(game.caterpillars[0].direction == -1)
+        #expect(game.caterpillars[0].segments[0].cell == Cell(col: 0, row: 4))
+        #expect(game.caterpillars[0].segments[1].cell == Cell(col: 0, row: 3))
+        #expect(game.caterpillars[0].direction == 1)
         nextMove(game)
-        #expect(game.caterpillars[0].segments[0].cell == Cell(col: 14, row: 4))
+        #expect(game.caterpillars[0].segments[0].cell == Cell(col: 1, row: 4))
     }
 
     @Test func dropsAndReversesAtAFlower() {
@@ -80,13 +80,13 @@ struct CaterpillarMovementTests {
     @Test func bouncesInsideThePlayerZone() {
         let game = garden()
         game.player.x = 0.5
-        game.caterpillars = [caterpillar(at: [(15, 19)], direction: 1)]
+        game.caterpillars = [caterpillar(at: [(9, 19)], direction: 1)]
         nextMove(game)
-        #expect(game.caterpillars[0].segments[0].cell == Cell(col: 15, row: 18))
+        #expect(game.caterpillars[0].segments[0].cell == Cell(col: 9, row: 18))
         #expect(game.caterpillars[0].vertical == -1)
     }
 
-    @Test func waveOneIsOneChainOfTwelve() {
+    @Test func waveOneIsOneFullChain() {
         let game = GameModel(rows: 20, seed: 1)
         #expect(game.caterpillars.count == 1)
         #expect(game.caterpillars[0].segments.count == Rules.chainLength)
@@ -96,16 +96,16 @@ struct CaterpillarMovementTests {
 struct HitTests {
     @Test func hittingAMiddleSegmentSplitsTheChain() {
         let game = garden()
-        game.caterpillars = [caterpillar(at: [(10, 5), (9, 5), (8, 5), (7, 5), (6, 5), (5, 5)], direction: 1)]
-        shoot(game, col: 8, row: 5)
+        game.caterpillars = [caterpillar(at: [(8, 5), (7, 5), (6, 5), (5, 5), (4, 5), (3, 5)], direction: 1)]
+        shoot(game, col: 6, row: 5)
         #expect(game.caterpillars.count == 2)
         let front = game.caterpillars[0]
         let back = game.caterpillars[1]
-        #expect(front.segments.map(\.cell) == [Cell(col: 10, row: 5), Cell(col: 9, row: 5)])
+        #expect(front.segments.map(\.cell) == [Cell(col: 8, row: 5), Cell(col: 7, row: 5)])
         #expect(front.direction == 1)
-        #expect(back.segments.map(\.cell) == [Cell(col: 7, row: 5), Cell(col: 6, row: 5), Cell(col: 5, row: 5)])
+        #expect(back.segments.map(\.cell) == [Cell(col: 5, row: 5), Cell(col: 4, row: 5), Cell(col: 3, row: 5)])
         #expect(back.direction == 1)
-        #expect(game.flower(at: Cell(col: 8, row: 5))?.health == 1)
+        #expect(game.flower(at: Cell(col: 6, row: 5))?.health == 1)
         #expect(game.score == Rules.bodyPoints)
     }
 
@@ -147,16 +147,24 @@ struct HitTests {
 }
 
 struct CreatureTests {
+    @Test func acornWaitsForTheSecondWave() {
+        let game = garden()
+        game.acornCooldown = 0
+        for _ in 0..<30 { tick(game) }
+        #expect(game.acorn == nil)
+    }
+
     @Test func acornComesOnlyWhenThePlayerZoneIsBare() {
         let game = garden()
-        for col in 0..<5 {
-            game.setFlower(.bloom, at: Cell(col: col * 2 + 1, row: 17))
+        game.wave = Rules.acornFirstWave
+        for col in 0..<Rules.acornThreshold {
+            game.setFlower(.bloom, at: Cell(col: col * 2 + 1, row: game.playerZoneTop))
         }
         game.acornCooldown = 0
         for _ in 0..<30 { tick(game) }
         #expect(game.acorn == nil)
 
-        game.setFlower(nil, at: Cell(col: 1, row: 17))
+        game.setFlower(nil, at: Cell(col: 1, row: game.playerZoneTop))
         tick(game)
         #expect(game.acorn != nil)
     }
@@ -175,7 +183,7 @@ struct CreatureTests {
         #expect(game.score == Rules.acornPoints)
     }
 
-    @Test(arguments: [(0, 900), (1, 900), (2, 600), (3, 300)])
+    @Test(arguments: [(0, 900), (1, 600), (2, 300)])
     func beeScoresByDistance(rowsAbove: Int, points: Int) {
         #expect(Rules.beePoints(rowsAbovePlayer: rowsAbove) == points)
         let game = garden()
@@ -203,7 +211,7 @@ struct LivesTests {
         let game = garden()
         game.setFlower(.bud, at: Cell(col: 3, row: 5))
         game.setFlower(Flower(health: 3, isSlippery: true), at: Cell(col: 4, row: 7))
-        game.setFlower(.bloom, at: Cell(col: 10, row: 9))
+        game.setFlower(.bloom, at: Cell(col: 2, row: 9))
         game.caterpillars.append(caterpillar(at: [(8, 19), (7, 19)], direction: 1))
 
         tick(game)
@@ -220,10 +228,11 @@ struct LivesTests {
     @Test func lastLifeEndsTheGame() {
         let game = garden()
         for _ in 0..<Rules.startingLives {
-            game.caterpillars.append(caterpillar(at: [(8, 19)], direction: 1))
-            for _ in 0..<90 where game.phase != .gameOver { tick(game) }
-            game.caterpillars = [caterpillar(at: [(0, 1)], direction: 1)]
+            for _ in 0..<90 where game.phase != .playing { tick(game) }
+            game.caterpillars = [caterpillar(at: [(0, 1)], direction: 1), caterpillar(at: [(8, 19)], direction: 1)]
+            for _ in 0..<90 where game.phase == .playing { tick(game) }
         }
+        for _ in 0..<90 where game.phase != .gameOver { tick(game) }
         #expect(game.lives == 0)
         #expect(game.phase == .gameOver)
     }

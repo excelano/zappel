@@ -90,16 +90,18 @@ final class Textures {
         return made
     }
 
-    /// The sky band behind the score row and the striped lawn below it.
-    func background(size: CGSize, palette: Palette, rows: Int, playerZoneTop: Int) -> SKTexture {
+    /// The sky band behind the score row and the striped lawn below it, the bottom
+    /// stripe running on down to the screen's edge.
+    func background(size: CGSize, palette: Palette, gridTop: CGFloat, rows: Int, playerZoneTop: Int) -> SKTexture {
         let cell = self.cell
         return Self.render(size, scale) { context in
-            let gridTop = CGFloat(rows) * cell
             let skyBottom = gridTop - cell
             for row in 1..<rows {
                 let color = row.isMultiple(of: 2) ? palette.grassLight : palette.grassDark
                 context.setFillColor(row >= playerZoneTop ? color.mixed(with: .white, 0.08).cgColor : color.cgColor)
-                context.fill(CGRect(x: 0, y: gridTop - CGFloat(row + 1) * cell, width: size.width, height: cell))
+                let top = gridTop - CGFloat(row) * cell
+                let bottom = row == rows - 1 ? 0 : top - cell
+                context.fill(CGRect(x: 0, y: bottom, width: size.width, height: top - bottom))
             }
             let colors = [palette.skyTop.cgColor, palette.skyBottom.cgColor] as CFArray
             if let gradient = CGGradient(colorsSpace: CGColorSpace(name: CGColorSpace.sRGB), colors: colors, locations: [0, 1]) {

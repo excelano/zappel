@@ -19,11 +19,13 @@ final class GameModel {
     let topRow = 1
     let bottomRow: Int
     let playerZoneTop: Int
+    /// The bee zigzags through the player zone and the row above it.
+    var beeTopRow: Int { playerZoneTop - 1 }
 
     private(set) var phase = Phase.playing
     private(set) var score = 0
     private(set) var lives = Rules.startingLives
-    private(set) var wave = 1
+    var wave = 1
     private(set) var nextExtraLife = Rules.extraLifeEvery
 
     var flowers: [Flower?]
@@ -143,7 +145,7 @@ final class GameModel {
     }
 
     private func movePlayer(to x: Double) {
-        player.x = min(max(x, 0.5), Double(columns) - 0.5)
+        player.x = min(max(x, Rules.playerRange.lowerBound), Rules.playerRange.upperBound)
     }
 
     // MARK: - Caterpillars
@@ -329,7 +331,7 @@ final class GameModel {
             beeTimer -= dt
             if beeTimer <= 0 {
                 let fromLeft = Bool.random(using: &rng)
-                let y = Double.random(in: Double(playerZoneTop) + 0.5...Double(bottomRow) + 0.5, using: &rng)
+                let y = Double.random(in: Double(beeTopRow) + 0.5...Double(bottomRow) + 0.5, using: &rng)
                 bee = Bee(x: fromLeft ? -0.5 : Double(columns) + 0.5, y: y,
                           vx: fromLeft ? Rules.beeSpeed : -Rules.beeSpeed,
                           vy: Bool.random(using: &rng) ? Rules.beeClimb : -Rules.beeClimb)
@@ -338,7 +340,7 @@ final class GameModel {
         }
         current.x += current.vx * dt
         current.y += current.vy * dt
-        let top = Double(playerZoneTop) + 0.5
+        let top = Double(beeTopRow) + 0.5
         let bottom = Double(bottomRow) + 0.5
         if current.y < top {
             current.y = top
@@ -362,7 +364,7 @@ final class GameModel {
     private func moveAcorn(_ dt: Double) {
         guard var current = acorn else {
             acornCooldown -= dt
-            if acornCooldown <= 0 && flowersInPlayerZone() < Rules.acornThreshold {
+            if wave >= Rules.acornFirstWave && acornCooldown <= 0 && flowersInPlayerZone() < Rules.acornThreshold {
                 acorn = Acorn(col: Int.random(in: 0..<columns, using: &rng), y: Double(topRow),
                               isCracked: false, row: topRow)
             }
@@ -488,9 +490,10 @@ final class GameModel {
         return count
     }
 
-    /// Scattered over the upper garden, never side by side.
+    /// Scattered over the upper garden, never side by side,
+    /// leaving the row above the player zone clear.
     private func plantInitialFlowers() {
-        let lastRow = bottomRow - 5
+        let lastRow = playerZoneTop - 2
         var planted = 0
         var attempts = 0
         while planted < Rules.initialFlowers && attempts < 2000 {

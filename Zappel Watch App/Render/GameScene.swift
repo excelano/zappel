@@ -55,6 +55,9 @@ final class GameScene: SKScene {
     private var clock: TimeInterval = 0
     private var hadBee = false
 
+    /// Cells of lawn below the bottom row, lifting the sprinkler clear of the rounded corners.
+    static let bottomMargin = 0.5
+
     private static let effectLimit = 40
     private static let popupLimit = 6
     private static let spinKey = "spin"
@@ -63,7 +66,7 @@ final class GameScene: SKScene {
         self.model = model
         playerTarget = model.player.x
         cell = size.width / CGFloat(model.columns)
-        gridTop = CGFloat(model.rows) * cell
+        gridTop = (CGFloat(model.rows) + Self.bottomMargin) * cell
         textures = Textures(cell: cell, scale: scale)
         palette = Palette.forWave(model.wave)
         caterpillarTextures = textures.caterpillar(palette.caterpillar)
@@ -321,7 +324,7 @@ final class GameScene: SKScene {
     }
 
     private func paintBackground() {
-        background.texture = textures.background(size: size, palette: palette, rows: model.rows,
+        background.texture = textures.background(size: size, palette: palette, gridTop: gridTop, rows: model.rows,
                                                  playerZoneTop: model.playerZoneTop)
     }
 

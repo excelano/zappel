@@ -81,7 +81,7 @@ struct Drop {
 }
 
 struct Player {
-    /// Center of the sprinkler, continuous between 0.5 and columns - 0.5.
+    /// Center of the sprinkler, continuous within `Rules.playerRange`.
     var x: Double
 }
 

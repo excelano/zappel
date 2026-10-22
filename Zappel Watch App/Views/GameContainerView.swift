@@ -21,7 +21,7 @@ struct GameContainerView: View {
     @FocusState private var isCrownFocused: Bool
 
     /// Cells the sprinkler moves per unit of crown rotation.
-    private static let crownGain = 1.0
+    private static let crownGain = 0.08
 
     var body: some View {
         GeometryReader { safeArea in
@@ -79,14 +79,14 @@ struct GameContainerView: View {
     }
 
     private func steer(to x: Double) {
-        scene?.playerTarget = min(max(x, 0.5), Double(Rules.columns) - 0.5)
+        scene?.playerTarget = min(max(x, Rules.playerRange.lowerBound), Rules.playerRange.upperBound)
     }
 
     private func newGame() {
         guard size.width > 0 else { return }
         // The sky band holding the score row reaches down past the system clock.
         let cell = size.width / CGFloat(Rules.columns)
-        let rows = Int((size.height - max(clockInset, cell)) / cell) + 1
+        let rows = Int((size.height - max(clockInset, cell) - GameScene.bottomMargin * cell) / cell) + 1
         let model = GameModel(rows: rows, seed: Self.seed())
         let scene = GameScene(size: size, model: model, scale: WKInterfaceDevice.current().screenScale)
         scene.reduceMotion = reduceMotion

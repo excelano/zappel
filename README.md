@@ -6,7 +6,7 @@ Zappel is an arcade game for Apple Watch. A caterpillar winds down through a gar
 
 Turn the Digital Crown, or slide a finger sideways, to move the sprinkler. It sprays by itself, one drop at a time. A hit on the middle of a caterpillar splits it in two, and the segment behind the hit becomes a new head. Flowers block the caterpillar and turn it back, and each takes three drops to clear.
 
-A bumblebee zigzags through the bottom of the garden and gathers flowers as it goes, worth more the closer it is when hit. An acorn drops when the bottom of the garden runs short of flowers, planting new ones on the way down, and takes two hits. From the third wave a snail crosses the upper garden and leaves flowers slippery; a caterpillar that touches one slides straight down.
+A bumblebee zigzags through the bottom of the garden and gathers flowers as it goes, worth more the closer it is when hit. From the second wave an acorn drops when the bottom of the garden runs short of flowers, planting new ones on the way down, and takes two hits. From the third wave a snail crosses the upper garden and leaves flowers slippery; a caterpillar that touches one slides straight down.
 
 A caterpillar, bee or acorn touching the sprinkler costs a life. The garden is then repaired, flower by flower, and the wave starts over with the segments that were left. Each new wave moves the garden further from morning toward dusk and brings faster caterpillars. A tap pauses the game, and lowering the wrist pauses it too.
 
