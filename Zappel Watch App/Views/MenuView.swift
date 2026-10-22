@@ -95,7 +95,9 @@ private struct HowToPlayView: View {
                 .font(.title)
                 .foregroundStyle(Palette.water.color)
             Text(text)
+                .font(.footnote)
                 .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.6)
         }
         .padding(.horizontal)
     }
