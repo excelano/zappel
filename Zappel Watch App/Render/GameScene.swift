@@ -46,7 +46,8 @@ final class GameScene: SKScene {
     private var effectNodes: [SKSpriteNode] = []
     private var popupNodes: [SKLabelNode] = []
     private let scoreLabel = SKLabelNode()
-    private var lifeNodes: [SKSpriteNode] = []
+    private let lifeIcon: SKSpriteNode
+    private let livesLabel = SKLabelNode()
     private let banner = SKLabelNode()
 
     private var shownScore = -1
@@ -78,6 +79,7 @@ final class GameScene: SKScene {
         beeNode = SKSpriteNode(texture: textures.beeFrames[0], size: textures.beeSize)
         acornNode = SKSpriteNode(texture: textures.acorn, size: textures.acornSize)
         snailNode = SKSpriteNode(texture: textures.snail, size: textures.snailSize)
+        lifeIcon = SKSpriteNode(texture: textures.lifeIcon, size: CGSize(width: cell * 0.9, height: cell * 0.9))
         super.init(size: size)
         scaleMode = .resizeFill
         backgroundColor = .black
@@ -110,17 +112,16 @@ final class GameScene: SKScene {
             creatureLayer.addChild(node)
         }
 
-        scoreLabel.horizontalAlignmentMode = .left
-        scoreLabel.verticalAlignmentMode = .center
         let hudY = (gridTop - cell + size.height) / 2
-        scoreLabel.position = CGPoint(x: cell * 2, y: hudY)
-        hudLayer.addChild(scoreLabel)
-        for index in 0..<Rules.maxLives {
-            let icon = SKSpriteNode(texture: textures.lifeIcon, size: CGSize(width: cell * 0.9, height: cell * 0.9))
-            icon.position = CGPoint(x: size.width * 0.4 + cell * 0.85 * CGFloat(index), y: hudY)
-            lifeNodes.append(icon)
-            hudLayer.addChild(icon)
+        for label in [scoreLabel, livesLabel] {
+            label.horizontalAlignmentMode = .left
+            label.verticalAlignmentMode = .center
+            label.position.y = hudY
+            hudLayer.addChild(label)
         }
+        scoreLabel.position.x = cell * 1.2
+        lifeIcon.position.y = hudY
+        hudLayer.addChild(lifeIcon)
 
         banner.horizontalAlignmentMode = .center
         banner.verticalAlignmentMode = .center
@@ -198,16 +199,19 @@ final class GameScene: SKScene {
             snailNode.isHidden = true
         }
 
-        if model.score != shownScore {
+        if model.score != shownScore || model.lives != shownLives {
             shownScore = model.score
-            scoreLabel.attributedText = Self.text("\(model.score)", size: cell * 0.95)
-        }
-        if model.lives != shownLives {
             shownLives = model.lives
-            for (index, icon) in lifeNodes.enumerated() {
-                icon.isHidden = index >= model.lives
-            }
+            layOutHUD()
         }
+    }
+
+    /// The score, then one sprinkler and the lives left, following the score as it grows.
+    private func layOutHUD() {
+        scoreLabel.attributedText = Self.text("\(model.score)", size: cell * 0.8)
+        lifeIcon.position.x = scoreLabel.frame.maxX + cell * 0.9
+        livesLabel.attributedText = Self.text("×\(model.lives)", size: cell * 0.7)
+        livesLabel.position.x = lifeIcon.position.x + cell * 0.45
     }
 
     private func syncFlowers() {
