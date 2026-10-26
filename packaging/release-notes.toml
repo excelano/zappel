@@ -2,7 +2,7 @@
 # against the release being cut, so notes left from last time stop the release
 # rather than reaching the listing.
 
-version = "1.0.0"
+version = "1.1.0"
 
 [locales."en-us"]
 whats-new = """
