@@ -9,6 +9,7 @@ struct ZappelApp: App {
     var body: some Scene {
         WindowGroup {
             MenuView()
+                .preferredColorScheme(.dark)
         }
     }
 }

@@ -1,7 +1,7 @@
 #!/bin/sh
 # The App Store screenshots, as recipes. shots-appstore builds the app for the
-# simulator, boots each simulator ship.toml names, installs the embedded watch
-# app, and calls this with the simulator, the language and where the frames go;
+# simulator, boots each simulator ship.toml names, installs the iPhone app or
+# its embedded watch app, and calls this with the simulator, the language and where the frames go;
 # this file is the half that is Zappel's: which screens, from gardens a Debug
 # build plays out the same way every time when launched with --play --seed.
 #
@@ -26,10 +26,10 @@ case "$lang" in
     *) echo "shots.sh: no set is written for $lang" >&2; exit 2 ;;
 esac
 case "$(xcrun simctl list devices | grep -F "($device)" | head -1)" in
-    *Watch*) ;;
-    *) echo "shots.sh: Zappel is watch-only; $device is not a watch" >&2; exit 2 ;;
+    *Watch*) plist=$(echo "$app"/Watch/*.app/Info.plist) ;;
+    *) plist=$app/Info.plist ;;
 esac
-bundle=$(/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$app"/Watch/*.app/Info.plist)
+bundle=$(/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$plist")
 mkdir -p "$outdir"
 shot() {
     name=$1

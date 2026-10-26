@@ -6,5 +6,5 @@ version = "1.0.0"
 
 [locales."en-us"]
 whats-new = """
-The first release of Zappel: save the garden from the caterpillars, right on your Apple Watch.
+The first release of Zappel: save the garden from the caterpillars on your iPhone or right on your Apple Watch.
 """

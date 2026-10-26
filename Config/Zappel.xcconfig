@@ -5,9 +5,9 @@
 // The values a fork changes to build its own copy of the app.
 
 DEVELOPMENT_TEAM = 9K6W5PMFYP
-// The App Store record's bundle id, carried by the iOS stub that ships the watch app.
-ZAPPEL_CONTAINER_BUNDLE_ID = com.excelano.zappel
-ZAPPEL_BUNDLE_ID = $(ZAPPEL_CONTAINER_BUNDLE_ID).watchkitapp
+// The App Store record's bundle id, carried by the iPhone app, which embeds the watch app.
+ZAPPEL_BUNDLE_ID = com.excelano.zappel
+ZAPPEL_WATCH_BUNDLE_ID = $(ZAPPEL_BUNDLE_ID).watchkitapp
 ZAPPEL_DISPLAY_NAME = Zappel
 
 #include "Version.xcconfig"

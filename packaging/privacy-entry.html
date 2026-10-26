@@ -1,19 +1,19 @@
 <!--
-    Zappel (Apple Watch) — Privacy entry for excelano.com/legal
+    Zappel (iPhone and Apple Watch) — Privacy entry for excelano.com/legal
     Author: David M. Anderson
     Built with AI assistance (Claude, Anthropic)
 -->
-<h3 id="zappel">Zappel (Apple Watch) &mdash; Privacy</h3>
-<p>Zappel is a garden arcade game for Apple Watch: a sprinkler at the bottom of the screen turns caterpillars into butterflies. A game like that needs to know a score and two switches, so that is all Zappel keeps. It cannot reach the internet, has no account to create and asks for no permissions. The App Store lists it under &ldquo;Data Not Collected&rdquo;.</p>
+<h3 id="zappel">Zappel (iPhone and Apple Watch) &mdash; Privacy</h3>
+<p>Zappel is a garden arcade game for iPhone and Apple Watch: a sprinkler at the bottom of the screen turns caterpillars into butterflies. A game like that needs to know a score and two switches, so that is all Zappel keeps. It cannot reach the internet, has no account to create and asks for no permissions. The App Store lists it under &ldquo;Data Not Collected&rdquo;.</p>
 
 <h4>A score and two switches</h4>
-<p>Zappel saves three values in the watch's storage for the app: your best score, and whether Sound and Haptics are on. No names or initials go with the score. Reset Best Score in Settings erases the score, and removing Zappel from the watch erases all three.</p>
+<p>Zappel saves three values in the app's storage on the iPhone or the watch: your best score, and whether Sound and Haptics are on. Each device keeps its own, and the two never exchange them. No names or initials go with the score. Reset Best Score in Settings erases the score, and removing Zappel from a device erases all three there.</p>
 
 <h4>No connection, no extras</h4>
 <p>No line of Zappel's code makes a network request. That rules out advertising, analytics, crash reporting, update checks and anything else that would need to phone out, and no code from other companies is built in. Zappel cannot see your location, health data, contacts or microphone.</p>
 
 <h4>What Apple shows the developer</h4>
-<p>Apple keeps install counts on its own, and passes the developer crash logs only from watches whose owners chose Share With App Developers. Both reach the developer as anonymous totals, and Zappel has no hand in either. The switch for crash logs is on the paired iPhone, in Settings &gt; Privacy &amp; Security &gt; Analytics &amp; Improvements.</p>
+<p>Apple keeps install counts on its own, and passes the developer crash logs only from devices whose owners chose Share With App Developers. Both reach the developer as anonymous totals, and Zappel has no hand in either. The switch for crash logs is on the iPhone, in Settings &gt; Privacy &amp; Security &gt; Analytics &amp; Improvements.</p>
 
 <h4>Seeing it for yourself</h4>
 <p>The three preference keys are the whole of <code>StorageKey</code>, in <code>HighScoreStore.swift</code>, and the rest of the source is public too, at <a href="https://github.com/excelano/zappel" rel="noopener noreferrer">github.com/excelano/zappel</a>. This section is kept in the same repository as <code>packaging/privacy-entry.html</code>; every change to it shows in the commit history.</p>

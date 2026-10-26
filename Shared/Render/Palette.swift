@@ -75,4 +75,7 @@ struct Palette {
     static let shell = RGB(0xD9822B)
     static let shellDark = RGB(0x8C4F16)
     static let snailBody = RGB(0xA7B89A)
+    static let soil = RGB(0x7A5534)
+    static let soilEdge = RGB(0x5A3C22)
+    static let stone = RGB(0xB5A48E)
 }

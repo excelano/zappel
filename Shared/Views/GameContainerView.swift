@@ -4,24 +4,28 @@
 
 import SpriteKit
 import SwiftUI
-import WatchKit
 
 struct GameContainerView: View {
     let onQuit: () -> Void
 
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.displayScale) private var displayScale
     @State private var scene: GameScene?
     @State private var size = CGSize.zero
     @State private var clockInset = 0.0
+    @State private var hudHeadroom = 0.0
+    @State private var homeIndicatorInset = 0.0
     @State private var isPaused = false
     @State private var result: GameResult?
-    @State private var crown = 0.0
     @State private var dragOrigin: Double?
+    #if os(watchOS)
+    @State private var crown = 0.0
     @FocusState private var isCrownFocused: Bool
 
     /// Cells the sprinkler moves per unit of crown rotation.
     private static let crownGain = 0.08
+    #endif
 
     var body: some View {
         GeometryReader { safeArea in
@@ -33,6 +37,13 @@ struct GameContainerView: View {
                         .gesture(steering(width: geometry.size.width))
                         .onTapGesture(perform: pause)
                 }
+                if controlStrip > 0 {
+                    Color.clear
+                        .frame(height: controlStrip)
+                        .contentShape(Rectangle())
+                        .gesture(pointing(width: geometry.size.width))
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                }
                 if let result {
                     GameOverView(result: result, onPlayAgain: newGame, onMenu: onQuit)
                 } else if isPaused {
@@ -42,6 +53,11 @@ struct GameContainerView: View {
             .onChange(of: geometry.size, initial: true) {
                 size = geometry.size
                 clockInset = safeArea.safeAreaInsets.top
+                #if os(iOS)
+                // The Dynamic Island sits mid-screen, where the watch's clock does not.
+                hudHeadroom = safeArea.safeAreaInsets.top
+                homeIndicatorInset = safeArea.safeAreaInsets.bottom
+                #endif
                 if scene == nil {
                     newGame()
                 }
@@ -50,6 +66,7 @@ struct GameContainerView: View {
             .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
+        #if os(watchOS)
         .focusable()
         .focused($isCrownFocused)
         .focusEffectDisabled()
@@ -58,12 +75,27 @@ struct GameContainerView: View {
         .onChange(of: crown) { old, new in
             steer(to: (scene?.playerTarget ?? 0) + (new - old) * Self.crownGain)
         }
+        // The overlays' buttons take the focus, so it comes back each time play does.
+        .onChange(of: isPlaying) {
+            if isPlaying {
+                isCrownFocused = true
+            }
+        }
+        .onAppear { isCrownFocused = true }
+        #else
+        .statusBarHidden()
+        .persistentSystemOverlays(.hidden)
+        .defersSystemGestures(on: .bottom)
+        #endif
         .onChange(of: scenePhase) {
             if scenePhase != .active {
                 pause()
             }
         }
-        .onAppear { isCrownFocused = true }
+    }
+
+    private var isPlaying: Bool {
+        result == nil && !isPaused
     }
 
     /// A drag moves the sprinkler as far as the finger moves.
@@ -78,6 +110,25 @@ struct GameContainerView: View {
             .onEnded { _ in dragOrigin = nil }
     }
 
+    /// A finger on the soil strip puts the sprinkler straight above it.
+    private func pointing(width: CGFloat) -> some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                guard !isPaused else { return }
+                steer(to: value.location.x / width * Double(Rules.columns))
+            }
+    }
+
+    /// The soil along the bottom of the iPhone's garden, where a finger steers without covering the sprinkler.
+    private var controlStrip: CGFloat {
+        #if os(iOS)
+        let cell = size.width / CGFloat(Rules.columns)
+        return max(2 * cell, homeIndicatorInset + cell)
+        #else
+        return 0
+        #endif
+    }
+
     private func steer(to x: Double) {
         scene?.playerTarget = min(max(x, Rules.playerRange.lowerBound), Rules.playerRange.upperBound)
     }
@@ -86,9 +137,12 @@ struct GameContainerView: View {
         guard size.width > 0 else { return }
         // The sky band holding the score row reaches down past the system clock.
         let cell = size.width / CGFloat(Rules.columns)
-        let rows = Int((size.height - max(clockInset, cell) - GameScene.bottomMargin * cell) / cell) + 1
+        let sky = max(clockInset, hudHeadroom + cell)
+        let lawn = GameScene.bottomMargin * cell + controlStrip
+        let rows = Int((size.height - sky - lawn) / cell) + 1
         let model = GameModel(rows: rows, seed: Self.seed())
-        let scene = GameScene(size: size, model: model, scale: WKInterfaceDevice.current().screenScale)
+        let scene = GameScene(size: size, model: model, scale: displayScale, headroom: hudHeadroom,
+                              controlStrip: controlStrip)
         scene.reduceMotion = reduceMotion
         scene.onGameOver = { score in
             let isNewBest = HighScoreStore.record(score: score)
@@ -97,7 +151,6 @@ struct GameContainerView: View {
         self.scene = scene
         result = nil
         isPaused = false
-        isCrownFocused = true
     }
 
     private func pause() {
@@ -109,7 +162,6 @@ struct GameContainerView: View {
     private func resume() {
         isPaused = false
         scene?.isGamePaused = false
-        isCrownFocused = true
     }
 
     private static func seed() -> UInt64 {
@@ -130,19 +182,13 @@ private struct PauseOverlay: View {
     let onQuit: () -> Void
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 6) {
-                Button("Resume", action: onResume)
-                    .buttonStyle(.borderedProminent)
-                    .tint(Palette.times[0].caterpillar.color)
-                    .foregroundStyle(.black)
-                Button("Restart", action: onRestart)
-                Button("Quit to Menu", action: onQuit)
-            }
-            .padding(.horizontal, 12)
-            .padding(.top, 24)
+        OverlayPanel(dimming: 0.75) {
+            Button("Resume", action: onResume)
+                .buttonStyle(.borderedProminent)
+                .tint(Palette.times[0].caterpillar.color)
+                .foregroundStyle(.black)
+            Button("Restart", action: onRestart)
+            Button("Quit to Menu", action: onQuit)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.black.opacity(0.75))
     }
 }
