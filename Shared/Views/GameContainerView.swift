@@ -42,6 +42,7 @@ struct GameContainerView: View {
                         .frame(height: controlStrip)
                         .contentShape(Rectangle())
                         .gesture(pointing(width: geometry.size.width))
+                        .padding(.bottom, bottomGap)
                         .frame(maxHeight: .infinity, alignment: .bottom)
                 }
                 if let result {
@@ -119,11 +120,19 @@ struct GameContainerView: View {
             }
     }
 
-    /// The soil along the bottom of the iPhone's garden, where a finger steers without covering the sprinkler.
+    /// The soil below the iPhone's garden, where a finger steers without covering the sprinkler.
     private var controlStrip: CGFloat {
         #if os(iOS)
-        let cell = size.width / CGFloat(Rules.columns)
-        return max(2 * cell, homeIndicatorInset + cell)
+        return 2 * size.width / CGFloat(Rules.columns)
+        #else
+        return 0
+        #endif
+    }
+
+    /// Bare earth under the strip, keeping the steering thumb off the home indicator.
+    private var bottomGap: CGFloat {
+        #if os(iOS)
+        return homeIndicatorInset + 0.25 * size.width / CGFloat(Rules.columns)
         #else
         return 0
         #endif
@@ -138,11 +147,11 @@ struct GameContainerView: View {
         // The sky band holding the score row reaches down past the system clock.
         let cell = size.width / CGFloat(Rules.columns)
         let sky = max(clockInset, hudHeadroom + cell)
-        let lawn = GameScene.bottomMargin * cell + controlStrip
+        let lawn = GameScene.bottomMargin * cell + controlStrip + bottomGap
         let rows = Int((size.height - sky - lawn) / cell) + 1
         let model = GameModel(rows: rows, seed: Self.seed())
         let scene = GameScene(size: size, model: model, scale: displayScale, headroom: hudHeadroom,
-                              controlStrip: controlStrip)
+                              controlStrip: controlStrip, bottomGap: bottomGap)
         scene.reduceMotion = reduceMotion
         scene.onGameOver = { score in
             let isNewBest = HighScoreStore.record(score: score)

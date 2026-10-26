@@ -26,6 +26,7 @@ final class GameScene: SKScene {
     private let gridTop: CGFloat
     private let headroom: CGFloat
     private let controlStrip: CGFloat
+    private let bottomGap: CGFloat
     private let textures: Textures
     private var palette: Palette
     private var caterpillarTextures: CaterpillarTextures
@@ -65,15 +66,16 @@ final class GameScene: SKScene {
     private static let popupLimit = 6
     private static let spinKey = "spin"
 
-    /// `headroom` is the height in points at the top the score keeps clear of, and `controlStrip`
-    /// the height of the soil along the bottom, below the lawn.
-    init(size: CGSize, model: GameModel, scale: CGFloat, headroom: CGFloat, controlStrip: CGFloat) {
+    /// `headroom` is the height in points at the top the score keeps clear of, `controlStrip` the height
+    /// of the soil below the lawn, and `bottomGap` the bare earth under it, clear of the home indicator.
+    init(size: CGSize, model: GameModel, scale: CGFloat, headroom: CGFloat, controlStrip: CGFloat, bottomGap: CGFloat) {
         self.model = model
         playerTarget = model.player.x
         cell = size.width / CGFloat(model.columns)
-        gridTop = (CGFloat(model.rows) + Self.bottomMargin) * cell + controlStrip
+        gridTop = (CGFloat(model.rows) + Self.bottomMargin) * cell + controlStrip + bottomGap
         self.headroom = headroom
         self.controlStrip = controlStrip
+        self.bottomGap = bottomGap
         textures = Textures(cell: cell, scale: scale)
         palette = Palette.forWave(model.wave)
         caterpillarTextures = textures.caterpillar(palette.caterpillar)
@@ -335,7 +337,8 @@ final class GameScene: SKScene {
 
     private func paintBackground() {
         background.texture = textures.background(size: size, palette: palette, gridTop: gridTop, rows: model.rows,
-                                                 playerZoneTop: model.playerZoneTop, soil: controlStrip)
+                                                 playerZoneTop: model.playerZoneTop, soil: controlStrip,
+                                                 gap: bottomGap)
     }
 
     private func spinSprinkler() {

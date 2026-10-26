@@ -92,7 +92,8 @@ final class Textures {
 
     /// The sky band behind the score row and the striped lawn below it, the bottom
     /// stripe running on down to the screen's edge.
-    func background(size: CGSize, palette: Palette, gridTop: CGFloat, rows: Int, playerZoneTop: Int, soil: CGFloat) -> SKTexture {
+    func background(size: CGSize, palette: Palette, gridTop: CGFloat, rows: Int, playerZoneTop: Int, soil: CGFloat,
+                    gap: CGFloat) -> SKTexture {
         let cell = self.cell
         return Self.render(size, scale) { context in
             let skyBottom = gridTop - cell
@@ -114,21 +115,23 @@ final class Textures {
             context.setFillColor(palette.grassDark.mixed(with: .black, 0.25).cgColor)
             context.fill(CGRect(x: 0, y: skyBottom - cell * 0.08, width: size.width, height: cell * 0.08))
             if soil > 0 {
-                Self.drawSoil(context, width: size.width, height: soil, cell: cell)
+                Self.drawSoil(context, width: size.width, height: soil, gap: gap, cell: cell)
             }
         }
     }
 
-    /// A strip of earth with a row of stepping stones, where a finger steers on iPhone.
-    private static func drawSoil(_ context: CGContext, width: CGFloat, height: CGFloat, cell: CGFloat) {
-        context.setFillColor(Palette.soil.cgColor)
-        context.fill(CGRect(x: 0, y: 0, width: width, height: height))
+    /// A strip of earth with a row of stepping stones, where a finger steers on iPhone,
+    /// above a darker band of bare earth that takes no touches.
+    private static func drawSoil(_ context: CGContext, width: CGFloat, height: CGFloat, gap: CGFloat, cell: CGFloat) {
+        let top = gap + height
         context.setFillColor(Palette.soilEdge.cgColor)
-        context.fill(CGRect(x: 0, y: height - cell * 0.1, width: width, height: cell * 0.1))
+        context.fill(CGRect(x: 0, y: 0, width: width, height: top))
+        context.setFillColor(Palette.soil.cgColor)
+        context.fill(CGRect(x: 0, y: gap, width: width, height: height - cell * 0.1))
         let stone = CGSize(width: cell * 0.62, height: cell * 0.34)
         for column in 0..<Rules.columns {
             let x = (CGFloat(column) + 0.5) * cell
-            let y = height - cell * (column.isMultiple(of: 2) ? 0.55 : 0.7)
+            let y = gap + height / 2 + cell * (column.isMultiple(of: 2) ? 0.08 : -0.08)
             let rect = CGRect(x: x - stone.width / 2, y: y - stone.height / 2, width: stone.width, height: stone.height)
             fillEllipse(context, rect.offsetBy(dx: 0, dy: -cell * 0.04), Palette.soilEdge.cgColor)
             fillEllipse(context, rect, Palette.stone.cgColor)
