@@ -30,21 +30,25 @@ struct GameContainerView: View {
     var body: some View {
         GeometryReader { safeArea in
             GeometryReader { geometry in
+            let garden = Self.garden(in: geometry.size)
             ZStack {
                 Color.black
-                if let scene {
-                    SpriteView(scene: scene, preferredFramesPerSecond: 60)
-                        .gesture(steering(width: geometry.size.width))
-                        .onTapGesture(perform: pause)
+                ZStack {
+                    if let scene {
+                        SpriteView(scene: scene, preferredFramesPerSecond: 60)
+                            .gesture(steering(width: garden.width))
+                            .onTapGesture(perform: pause)
+                    }
+                    if controlStrip > 0 {
+                        Color.clear
+                            .frame(height: controlStrip)
+                            .contentShape(Rectangle())
+                            .gesture(pointing(width: garden.width))
+                            .padding(.bottom, bottomGap)
+                            .frame(maxHeight: .infinity, alignment: .bottom)
+                    }
                 }
-                if controlStrip > 0 {
-                    Color.clear
-                        .frame(height: controlStrip)
-                        .contentShape(Rectangle())
-                        .gesture(pointing(width: geometry.size.width))
-                        .padding(.bottom, bottomGap)
-                        .frame(maxHeight: .infinity, alignment: .bottom)
-                }
+                .frame(width: garden.width, height: garden.height)
                 if let result {
                     GameOverView(result: result, onPlayAgain: newGame, onMenu: onQuit)
                 } else if isPaused {
@@ -52,7 +56,7 @@ struct GameContainerView: View {
                 }
             }
             .onChange(of: geometry.size, initial: true) {
-                size = geometry.size
+                size = garden
                 clockInset = safeArea.safeAreaInsets.top
                 #if os(iOS)
                 // The Dynamic Island sits mid-screen, where the watch's clock does not.
@@ -94,6 +98,21 @@ struct GameContainerView: View {
             }
         }
     }
+
+    /// The garden in a screen of this size. On an iPad it keeps an iPhone's
+    /// shape, between bars, so it is as deep in rows as on the phone and keeps
+    /// its shape when the iPad turns.
+    private static func garden(in size: CGSize) -> CGSize {
+        #if os(iOS)
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            return CGSize(width: min(size.width, size.height * phoneAspect), height: size.height)
+        }
+        #endif
+        return size
+    }
+
+    /// Width over height of an iPhone 17 Pro's screen.
+    private static let phoneAspect = 0.46
 
     private var isPlaying: Bool {
         result == nil && !isPaused

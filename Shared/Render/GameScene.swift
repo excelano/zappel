@@ -89,7 +89,7 @@ final class GameScene: SKScene {
         snailNode = SKSpriteNode(texture: textures.snail, size: textures.snailSize)
         lifeIcon = SKSpriteNode(texture: textures.lifeIcon, size: CGSize(width: cell * 0.9, height: cell * 0.9))
         super.init(size: size)
-        scaleMode = .resizeFill
+        scaleMode = .aspectFit
         backgroundColor = .black
         buildNodes()
     }

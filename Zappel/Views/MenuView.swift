@@ -32,6 +32,7 @@ struct MenuView: View {
                 NavigationLink("Settings") { SettingsView() }
                 Spacer()
             }
+            .frame(maxWidth: 420)
             .padding(.horizontal, 32)
         }
         .fullScreenCover(isPresented: $isPlaying) {
