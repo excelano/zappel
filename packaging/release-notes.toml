@@ -2,9 +2,9 @@
 # against the release being cut, so notes left from last time stop the release
 # rather than reaching the listing.
 
-version = "1.2.0"
+version = "1.3.0"
 
 [locales."en-us"]
 whats-new = """
-The first release of Zappel: save the garden from the caterpillars on your iPhone, your iPad or right on your Apple Watch. On an iPad the garden keeps the phone's tall shape, so it plays the same, upright or turned.
+The first release of Zappel: save the garden from the caterpillars on your iPhone, your iPad or right on your Apple Watch. On an iPad the garden fills the screen, as deep as on the phone and wider.
 """

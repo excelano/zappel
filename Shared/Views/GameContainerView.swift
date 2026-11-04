@@ -12,7 +12,7 @@ struct GameContainerView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.displayScale) private var displayScale
     @State private var scene: GameScene?
-    @State private var size = CGSize.zero
+    @State private var viewSize = CGSize.zero
     @State private var clockInset = 0.0
     @State private var hudHeadroom = 0.0
     @State private var homeIndicatorInset = 0.0
@@ -30,25 +30,26 @@ struct GameContainerView: View {
     var body: some View {
         GeometryReader { safeArea in
             GeometryReader { geometry in
-            let garden = Self.garden(in: geometry.size)
             ZStack {
                 Color.black
-                ZStack {
-                    if let scene {
+                if let scene {
+                    let shown = Self.fit(scene.size, in: geometry.size)
+                    let scale = shown.width / scene.size.width
+                    ZStack {
                         SpriteView(scene: scene, preferredFramesPerSecond: 60)
-                            .gesture(steering(width: garden.width))
+                            .gesture(steering(width: shown.width))
                             .onTapGesture(perform: pause)
+                        if scene.controlStrip > 0 {
+                            Color.clear
+                                .frame(height: scene.controlStrip * scale)
+                                .contentShape(Rectangle())
+                                .gesture(pointing(width: shown.width))
+                                .padding(.bottom, scene.bottomGap * scale)
+                                .frame(maxHeight: .infinity, alignment: .bottom)
+                        }
                     }
-                    if controlStrip > 0 {
-                        Color.clear
-                            .frame(height: controlStrip)
-                            .contentShape(Rectangle())
-                            .gesture(pointing(width: garden.width))
-                            .padding(.bottom, bottomGap)
-                            .frame(maxHeight: .infinity, alignment: .bottom)
-                    }
+                    .frame(width: shown.width, height: shown.height)
                 }
-                .frame(width: garden.width, height: garden.height)
                 if let result {
                     GameOverView(result: result, onPlayAgain: newGame, onMenu: onQuit)
                 } else if isPaused {
@@ -56,7 +57,7 @@ struct GameContainerView: View {
                 }
             }
             .onChange(of: geometry.size, initial: true) {
-                size = garden
+                viewSize = geometry.size
                 clockInset = safeArea.safeAreaInsets.top
                 #if os(iOS)
                 // The Dynamic Island sits mid-screen, where the watch's clock does not.
@@ -99,20 +100,30 @@ struct GameContainerView: View {
         }
     }
 
-    /// The garden in a screen of this size. On an iPad it keeps an iPhone's
-    /// shape, between bars, so it is as deep in rows as on the phone and keeps
-    /// its shape when the iPad turns.
-    private static func garden(in size: CGSize) -> CGSize {
+    /// Ten columns, or on an iPad as many as fill the screen with cells the
+    /// size an iPhone's garden has at this height, so it is as deep in rows.
+    private static func columns(in size: CGSize) -> Int {
         #if os(iOS)
         if UIDevice.current.userInterfaceIdiom == .pad {
-            return CGSize(width: min(size.width, size.height * phoneAspect), height: size.height)
+            let cell = size.height * phoneAspect / CGFloat(Rules.columns)
+            return max(Rules.columns, Int((size.width / cell).rounded()))
         }
         #endif
-        return size
+        return Rules.columns
     }
 
     /// Width over height of an iPhone 17 Pro's screen.
     private static let phoneAspect = 0.46
+
+    /// The scene scaled to fit the view, between bars for a game begun before the iPad turned.
+    private static func fit(_ scene: CGSize, in view: CGSize) -> CGSize {
+        let scale = min(view.width / scene.width, view.height / scene.height)
+        return CGSize(width: scene.width * scale, height: scene.height * scale)
+    }
+
+    private var columns: Double {
+        Double(scene?.model.columns ?? Rules.columns)
+    }
 
     private var isPlaying: Bool {
         result == nil && !isPaused
@@ -125,7 +136,7 @@ struct GameContainerView: View {
                 guard let scene, !isPaused else { return }
                 let origin = dragOrigin ?? scene.playerTarget
                 dragOrigin = origin
-                steer(to: origin + value.translation.width / width * Double(Rules.columns))
+                steer(to: origin + value.translation.width / width * columns)
             }
             .onEnded { _ in dragOrigin = nil }
     }
@@ -135,41 +146,35 @@ struct GameContainerView: View {
         DragGesture(minimumDistance: 0)
             .onChanged { value in
                 guard !isPaused else { return }
-                steer(to: value.location.x / width * Double(Rules.columns))
+                steer(to: value.location.x / width * columns)
             }
     }
 
-    /// The soil below the iPhone's garden, where a finger steers without covering the sprinkler.
-    private var controlStrip: CGFloat {
-        #if os(iOS)
-        return 2 * size.width / CGFloat(Rules.columns)
-        #else
-        return 0
-        #endif
-    }
-
-    /// Bare earth under the strip, keeping the steering thumb off the home indicator.
-    private var bottomGap: CGFloat {
-        #if os(iOS)
-        return homeIndicatorInset + 0.25 * size.width / CGFloat(Rules.columns)
-        #else
-        return 0
-        #endif
-    }
-
     private func steer(to x: Double) {
-        scene?.playerTarget = min(max(x, Rules.playerRange.lowerBound), Rules.playerRange.upperBound)
+        guard let scene else { return }
+        let range = scene.model.playerRange
+        scene.playerTarget = min(max(x, range.lowerBound), range.upperBound)
     }
 
     private func newGame() {
-        guard size.width > 0 else { return }
+        guard viewSize.width > 0 else { return }
+        let columns = Self.columns(in: viewSize)
+        let cell = viewSize.width / CGFloat(columns)
+        #if os(iOS)
+        // The soil below the garden, where a finger steers without covering the sprinkler,
+        // over bare earth that keeps the thumb off the home indicator.
+        let controlStrip = 2 * cell
+        let bottomGap = homeIndicatorInset + 0.25 * cell
+        #else
+        let controlStrip = 0.0
+        let bottomGap = 0.0
+        #endif
         // The sky band holding the score row reaches down past the system clock.
-        let cell = size.width / CGFloat(Rules.columns)
         let sky = max(clockInset, hudHeadroom + cell)
         let lawn = GameScene.bottomMargin * cell + controlStrip + bottomGap
-        let rows = Int((size.height - sky - lawn) / cell) + 1
-        let model = GameModel(rows: rows, seed: Self.seed())
-        let scene = GameScene(size: size, model: model, scale: displayScale, headroom: hudHeadroom,
+        let rows = Int((viewSize.height - sky - lawn) / cell) + 1
+        let model = GameModel(rows: rows, columns: columns, seed: Self.seed())
+        let scene = GameScene(size: viewSize, model: model, scale: displayScale, headroom: hudHeadroom,
                               controlStrip: controlStrip, bottomGap: bottomGap)
         scene.reduceMotion = reduceMotion
         scene.onGameOver = { score in

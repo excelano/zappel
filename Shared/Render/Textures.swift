@@ -129,7 +129,7 @@ final class Textures {
         context.setFillColor(Palette.soil.cgColor)
         context.fill(CGRect(x: 0, y: gap, width: width, height: height - cell * 0.1))
         let stone = CGSize(width: cell * 0.62, height: cell * 0.34)
-        for column in 0..<Rules.columns {
+        for column in 0..<Int((width / cell).rounded()) {
             let x = (CGFloat(column) + 0.5) * cell
             let y = gap + height / 2 + cell * (column.isMultiple(of: 2) ? 0.08 : -0.08)
             let rect = CGRect(x: x - stone.width / 2, y: y - stone.height / 2, width: stone.width, height: stone.height)

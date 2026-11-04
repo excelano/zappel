@@ -3,12 +3,10 @@
 // Built with AI assistance (Claude, Anthropic)
 
 enum Rules {
+    /// The garden's width on iPhone and watch; an iPad fits more.
     static let columns = 10
     static let playerZoneRows = 2
     static let timestep = 1.0 / 60.0
-
-    /// Where the sprinkler's center may go, in cells.
-    static let playerRange = 0.5...(Double(columns) - 0.5)
 
     static let startingLives = 3
     static let maxLives = 6
@@ -19,6 +17,7 @@ enum Rules {
     static let maxCaterpillars = 10
     static let sideSpawnInterval = 6.0
 
+    /// Flowers planted at the start in a ten-column garden, more in a wider one.
     static let initialFlowers = 10
     static let flowerHealth = 3
 

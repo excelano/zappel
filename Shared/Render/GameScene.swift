@@ -25,8 +25,8 @@ final class GameScene: SKScene {
     private let cell: CGFloat
     private let gridTop: CGFloat
     private let headroom: CGFloat
-    private let controlStrip: CGFloat
-    private let bottomGap: CGFloat
+    let controlStrip: CGFloat
+    let bottomGap: CGFloat
     private let textures: Textures
     private var palette: Palette
     private var caterpillarTextures: CaterpillarTextures

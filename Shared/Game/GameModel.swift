@@ -13,7 +13,7 @@ final class GameModel {
         case gameOver
     }
 
-    let columns = Rules.columns
+    let columns: Int
     let rows: Int
     /// Row 0 holds the score; the garden starts below it.
     let topRow = 1
@@ -21,6 +21,8 @@ final class GameModel {
     let playerZoneTop: Int
     /// The bee zigzags through the player zone and the row above it.
     var beeTopRow: Int { playerZoneTop - 1 }
+    /// Where the sprinkler's center may go, in cells.
+    var playerRange: ClosedRange<Double> { 0.5...(Double(columns) - 0.5) }
 
     private(set) var phase = Phase.playing
     private(set) var score = 0
@@ -51,13 +53,14 @@ final class GameModel {
     var moveProgress: Double { min(1, moveClock / Rules.moveInterval(wave: wave)) }
 
     /// A new game, or with `populated` false an empty garden for tests to arrange.
-    init(rows: Int, seed: UInt64, populated: Bool = true) {
+    init(rows: Int, columns: Int = Rules.columns, seed: UInt64, populated: Bool = true) {
         precondition(rows >= Rules.playerZoneRows + 6, "the garden is too short")
+        self.columns = columns
         self.rows = rows
         bottomRow = rows - 1
         playerZoneTop = rows - Rules.playerZoneRows
-        flowers = Array(repeating: nil, count: rows * Rules.columns)
-        player = Player(x: Double(Rules.columns) / 2)
+        flowers = Array(repeating: nil, count: rows * columns)
+        player = Player(x: Double(columns) / 2)
         rng = SplitMix64(seed: seed)
         beeTimer = Double.random(in: Rules.beeDelay, using: &rng)
         events.reserveCapacity(32)
@@ -145,7 +148,7 @@ final class GameModel {
     }
 
     private func movePlayer(to x: Double) {
-        player.x = min(max(x, Rules.playerRange.lowerBound), Rules.playerRange.upperBound)
+        player.x = min(max(x, playerRange.lowerBound), playerRange.upperBound)
     }
 
     // MARK: - Caterpillars
@@ -496,7 +499,7 @@ final class GameModel {
         let lastRow = playerZoneTop - 2
         var planted = 0
         var attempts = 0
-        while planted < Rules.initialFlowers && attempts < 2000 {
+        while planted < Rules.initialFlowers * columns / Rules.columns && attempts < 2000 {
             attempts += 1
             let cell = Cell(col: Int.random(in: 0..<columns, using: &rng),
                             row: Int.random(in: 2...lastRow, using: &rng))
