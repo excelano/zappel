@@ -2,16 +2,18 @@
 
 ## Reporting a vulnerability
 
-Please report suspected vulnerabilities privately through GitHub Security Advisories at https://github.com/excelano/zappel/security/advisories/new. If you would rather not use GitHub, email david.anderson@excelano.com instead. I aim to respond within seven days.
+Please report suspected vulnerabilities privately, using the **Report a vulnerability** button on the Security tab of this repository. If that button is not there, or you would rather not go through GitHub, email david.anderson@excelano.com instead. I aim to respond within seven days.
 
 Please do not open public issues for security problems.
 
 ## Supported versions
 
-Only the latest version on the App Store receives fixes. Security fixes ship through `main` and reach the App Store in the next release; there are no maintained release branches.
+The latest release receives security fixes. Older versions are not supported. A fix ships in a new App Store release.
 
-## Security model
+## What Zappel can access
 
-**Zappel has no network surface.** It makes no network request, opens no socket and links no networking or analytics code. It requests no entitlements beyond the defaults, so it cannot reach contacts, location, health data, the microphone or anything else on the watch.
+Zappel makes no network request, opens no socket and links no networking or analytics code. It requests no entitlements beyond the defaults, so it cannot reach contacts, location, health data, the microphone or anything else on the iPhone or the watch. The iPhone and watch apps do not talk to each other.
 
-**What it keeps stays on the watch.** The best score, the last wave reached and the sound and haptics settings are kept in the app's own preferences on the watch, and removing the app removes them.
+## What Zappel stores
+
+The best score and the sound and haptics settings are kept in each app's own preferences on its device, and removing the app removes them.
