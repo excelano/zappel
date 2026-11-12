@@ -1,6 +1,6 @@
 # Zappel
 
-Zappel is an arcade game for iPhone and Apple Watch. A caterpillar winds down through a garden, and a sprinkler at the bottom sprays water at it. Every segment the water hits turns into a butterfly and flutters away, leaving a flower bud behind. Each device plays the whole game by itself, with no account, no network, no ads and no analytics, and the watch app needs no iPhone, so it works on a watch set up through Family Setup. Its Linux desktop port is [zappel-desktop](https://github.com/excelano/zappel-desktop).
+Zappel is an arcade game for iPhone and Apple Watch. A caterpillar winds down through a garden, and a sprinkler at the bottom sprays water at it. Every segment the water hits turns into a butterfly and flutters away, leaving a flower bud behind. Each device plays the whole game by itself, with no account, no network, no ads and no analytics, and the watch app needs no iPhone, so it works on a watch set up through Family Setup. Its Linux desktop port is [zappel-rs](https://github.com/excelano/zappel-rs).
 
 ## Playing
 
